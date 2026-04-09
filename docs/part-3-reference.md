@@ -17,7 +17,7 @@
 | Custom Agents | `.github/agents/` OR anywhere | `.agent.md` or any `.md` in agents/ |
 | MCP Servers | `.vscode/mcp.json` | `.json` |
 | Hooks | `.github/hooks/` | `.json` |
-| Memory | GitHub cloud (repository-scoped) | N/A |
+| Copilot Memory | Managed by GitHub | N/A — no repo file |
 
 ---
 
@@ -41,7 +41,6 @@ No frontmatter required. Plain markdown file.
 | `applyTo` | **Yes** | string | Glob pattern for automatic activation |
 | `name` | No | string | Display name (defaults to filename) |
 | `description` | No | string | Description shown on hover |
-| `excludeAgent` | No | string | Agent to exclude from these instructions (`"code-review"` or `"coding-agent"`, GitHub.com only) |
 
 ```yaml
 ---
@@ -55,7 +54,7 @@ applyTo: 'src/components/**/*.tsx'
 
 | Field | Required | Type | Description |
 |-------|----------|------|-------------|
-| `agent` | No | string | `ask`, `plan`, `agent`, or custom agent name |
+| `agent` | No | string | `ask`, `agent`, `plan`, or custom agent name |
 | `description` | No | string | Brief description for `/` menu |
 | `model` | No | string | AI model (e.g., `Claude Opus 4.6`, `GPT-5.2`) |
 | `tools` | No | string[] | Restrict available tools |
@@ -76,6 +75,9 @@ tools: ['editFiles', 'createFile', 'runInTerminal']
 |-------|----------|------|-------------|
 | `name` | **Yes** | string | 1-64 chars, lowercase, hyphens only |
 | `description` | **Yes** | string | 1-1024 chars, WHAT + WHEN to use |
+| `argument-hint` | No | string | Hint text shown when invoked as `/` command |
+| `user-invocable` | No | boolean | Show as `/` slash command (default: `true`) |
+| `disable-model-invocation` | No | boolean | Require manual `/` invocation only (default: `false`) |
 | `metadata` | No | object | Key-value pairs (author, version) |
 | `license` | No | string | License name or reference |
 | `compatibility` | No | string | Environment requirements |
@@ -109,9 +111,12 @@ metadata:
 | `model` | No | string or string[] | AI model to use. Supports arrays for fallback: `['Claude Sonnet 4.5 (copilot)', 'GPT-5 (copilot)']` |
 | `handoffs` | No | object[] | Transitions to other agents |
 | `argument-hint` | No | string | Hint text for user interaction |
-| `user-invokable` | No | boolean | Whether agent appears in the agents dropdown (default: `true`). Set to `false` for subagent-only agents |
-| `disable-model-invocation` | No | boolean | Prevents the agent from being invoked as a subagent (default: `false`). Set to `true` for user-only agents |
-| `agents` | No | string[] | Restrict which subagents this agent can invoke. Accepts names, `*` (all), or `[]` (none) |
+| `user-invokable` | No | boolean | Show in agents dropdown (default: `true`) |
+| `disable-model-invocation` | No | boolean | Prevent subagent invocation (default: `false`) |
+| `agents` | No | string[] | Restrict available subagents: names, `*`, or `[]` |
+| `target` | No | string | Target environment: `vscode` or `github-copilot` |
+| `mcp-servers` | No | object[] | MCP servers for `github-copilot` target |
+| `hooks` | No | object | Agent-scoped hooks (Preview) |
 
 ```yaml
 ---
@@ -123,6 +128,8 @@ handoffs:
   - label: 'Fix Issues'
     agent: 'agent'
     prompt: 'Fix the security issues identified above.'
+    send: false
+    model: 'GPT-5.2 (copilot)'
 ---
 ```
 
@@ -134,9 +141,10 @@ handoffs:
 |------|----------------|----------|
 | `ask` | Respond conversationally (read-only) | Q&A, explanations, code review, brainstorming |
 | `agent` | Create/edit files, run commands | Any task that modifies code |
+| `plan` | Generate structured implementation plans | Breaking down tasks before implementation |
 | Custom agent | Use that agent's persona and tools | Specialized workflows |
 
-**Note:** `plan` mode exists but is not recommended. Use `agent` for any file modifications.
+**Note:** `edit` mode is officially deprecated as of VS Code 1.110 and will be fully removed in VS Code 1.125. Use `agent` for any file modifications.
 
 ---
 
@@ -193,13 +201,13 @@ handoffs:
 }
 ```
 
-### HTTP/SSE/Streamable Server
+### HTTP Server
 
 ```json
 {
   "servers": {
     "remote-server": {
-      "type": "sse",
+      "type": "http",
       "url": "https://example.com/mcp",
       "headers": { "Authorization": "Bearer ${env:TOKEN}" }
     },
@@ -229,14 +237,14 @@ Use `sse` for Server-Sent Events transport. Use `http` for the newer streamable 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `type` | string | `stdio`, `sse`, or `http` |
+| `type` | string | `stdio` or `http` |
 | `command` | string | Executable (for stdio) |
 | `args` | string[] | Command arguments |
 | `env` | object | Environment variables |
 | `cwd` | string | Working directory |
 | `envFile` | string | Path to .env file |
-| `url` | string | Server URL (for sse/http) |
-| `headers` | object | HTTP headers (for sse/http) |
+| `url` | string | Server URL (for http) |
+| `headers` | object | HTTP headers (for http) |
 | `disabled` | boolean | Disable this server |
 | `dev` | object | Development mode config with `watch` and `build` commands |
 
@@ -300,11 +308,11 @@ Hook configuration files live in `.github/hooks/` and require `version: 1`:
 | `postToolUse` | `timestamp`, `cwd`, `toolName`, `toolArgs`, `toolResult` | Ignored | No |
 | `errorOccurred` | `timestamp`, `cwd`, `error` | Ignored | No |
 
-For comprehensive documentation with practical examples, see [Part 2.7: Hooks](part-2-7-hooks.md).
+For comprehensive documentation with practical examples, see [Primitive 7: Hooks](primitive-7-hooks.md).
 
 ### VS Code Hooks (Chat Agent Sessions)
 
-VS Code 1.109.3+ supports hooks in Chat agent sessions via file-based configuration in `.github/hooks/*.json`. Eight PascalCase events are available: `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PreCompact`, `SubagentStart`, `SubagentStop`, and `Stop`. See [Part 2.7: VS Code Hooks](part-2-7-hooks.md#vs-code-hooks-chat-agent-sessions) for configuration details.
+VS Code 1.109.3+ supports hooks in Chat agent sessions via file-based configuration in `.github/hooks/*.json`. Eight PascalCase events are available: `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PreCompact`, `SubagentStart`, `SubagentStop`, and `Stop`. See [Primitive 7: VS Code Hooks](primitive-7-hooks.md#vs-code-hooks-chat-agent-sessions) for configuration details.
 
 ---
 
@@ -324,7 +332,7 @@ VS Code 1.109.3+ supports hooks in Chat agent sessions via file-based configurat
 
 ## Copilot Memory (Preview)
 
-For comprehensive coverage of Copilot Memory — including architecture, enablement, memory lifecycle, and practical guidance — see [Part 2.8: Memory](part-2-8-memory.md).
+For comprehensive coverage of Copilot Memory — including architecture, enablement, memory lifecycle, and practical guidance — see [Primitive 8: Memory](primitive-8-memory.md).
 
 ---
 
@@ -367,9 +375,9 @@ Configure allowed file system paths and network domains via `chat.tools.terminal
 |-----------|----------|
 | Rules that apply everywhere | Always-On Instructions |
 | Rules for specific file types | File-Based Instructions |
-| Repeatable task template | Prompt File |
-| Reusable capability with resources | Skill |
+| Reusable workflow or procedural knowledge | Skill |
 | Specialized AI persona | Custom Agent |
+| Simple single-purpose slash command | Prompt File |
 | External API/database access | MCP Server |
 | Rules + external access | Skill + MCP together |
 | Block dangerous agent commands | Hook (`preToolUse`) |
@@ -633,20 +641,21 @@ You are [persona description].
 
 ## Primitive Comparison
 
-| | Instructions | File-Based | Prompts | Skills | Agents | MCP | Hooks | Memory |
-|-|--------------|------------|---------|--------|--------|-----|-------|--------|
-| **Always loaded** | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌¹ | ❌² |
-| **User invokes** | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Auto-activates** | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅¹ | ✅² |
-| **Has frontmatter** | ❌ | ✅ | ✅ | ✅ | ✅ | N/A | N/A | N/A |
-| **Can include files** | ❌ | ❌ | ❌ | ✅ | ❌ | N/A | N/A | N/A |
-| **External access** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
-| **Portable** | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ |
-| **Can block actions** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Visible to LLM** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| | Instructions | File-Based | Prompts | Skills | Agents | MCP | Hooks |
+|-|--------------|------------|---------|--------|--------|-----|-------|
+| **Always loaded** | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌¹ |
+| **User invokes** | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| **Auto-activates** | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅¹ |
+| **Has frontmatter** | ❌ | ✅ | ✅ | ✅ | ✅ | N/A | N/A |
+| **Can include files** | ❌ | ❌ | ❌ | ✅ | ❌ | N/A | N/A |
+| **External access** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| **Portable** | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ |
+| **Can block actions** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Visible to LLM** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **CLI support** | ✅ | ✅ | ❌² | ✅ | ✅ | ✅ | ✅¹ |
 
-¹ Hooks are active during coding agent, Copilot CLI, and VS Code Chat agent sessions (1.109.3+), not in inline completions.
-² Memory is retrieved and validated on-demand; it auto-activates when relevant context is found but may not surface in every session.
+¹ Hooks are only active during coding agent and Copilot CLI sessions, not in Chat/Completions/Inline.
+² Prompt files (`.prompt.md`) are a VS Code feature. Copilot CLI uses natural language prompts and custom agents instead.
 
 ---
 
@@ -705,8 +714,12 @@ Reference environment variables with `${env:VAR_NAME}`:
 |----------|-----|
 | GitHub Copilot Docs | https://docs.github.com/en/copilot |
 | VS Code Copilot Docs | https://code.visualstudio.com/docs/copilot |
+| GitHub Copilot CLI | https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli |
 | MCP Specification | https://modelcontextprotocol.io |
 | Agent Skills Spec | https://agentskills.io |
+| Copilot Memory (concepts) | https://docs.github.com/en/copilot/concepts/agents/copilot-memory |
+| Copilot Memory (managing) | https://docs.github.com/en/copilot/how-tos/use-copilot-agents/copilot-memory |
+| GitHub Agentic Workflows | https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/ |
 | Awesome Copilot | https://github.com/github/awesome-copilot |
 
 ---
@@ -716,9 +729,10 @@ Reference environment variables with `${env:VAR_NAME}`:
 | Timeline | Action | Outcome |
 |----------|--------|---------|
 | Day 1 | Create `copilot-instructions.md` with 5 key rules | Immediate convention enforcement |
-| Week 1 | Add 2-3 prompt files for repeated tasks | Consistent task automation |
-| Month 1 | Implement custom agents for specialized workflows | Role-based AI assistance |
-| Quarter 1 | Evaluate MCP servers, Skills, and Hooks | External integrations, portable capabilities, runtime enforcement |
+| Week 1 | Add 2-3 skills for repeated workflows (scaffolding, testing, deployments) | Portable task automation across VS Code, CLI, and coding agent |
+| Week 2 | Create 1-2 custom agents (code reviewer, architect) | Role-based AI assistance |
+| Month 1 | Evaluate MCP servers and Hooks | External integrations, runtime enforcement |
+| Ongoing | Add prompt files for simple single-purpose slash commands as needed | Quick task shortcuts |
 
 ---
 

@@ -53,13 +53,13 @@ End every review with a **Beginner Verdict:** a one-sentence summary of whether 
 
 After reviewing a documentation file, write your feedback to `.github/feedback/` so the Doc Maintainer can pick it up.
 
-**File naming:** `newb-{target}-{date}.md` (e.g., `newb-part-2-3-prompts-2026-02-20.md`). For `ReadMe.md`, use `newb-readme-{date}.md`.
+**File naming:** `newb-{target}-{date}.md` (e.g., `newb-primitive-3-prompts-2026-02-20.md`). For `ReadMe.md`, use `newb-readme-{date}.md`.
 
 **Frontmatter:**
 ```yaml
 ---
 reviewer: 'The Newb'
-target: 'docs/part-2-3-prompts.md'
+target: 'docs/primitive-3-prompts.md'
 date: 2026-02-20
 status: pending
 ---

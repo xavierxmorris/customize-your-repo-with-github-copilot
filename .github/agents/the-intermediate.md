@@ -55,13 +55,13 @@ End every review with a **Practitioner Verdict:** a one-sentence summary of whet
 
 After reviewing a documentation file, write your feedback to `.github/feedback/` so the Doc Maintainer can pick it up.
 
-**File naming:** `intermediate-{target}-{date}.md` (e.g., `intermediate-part-2-4-skills-2026-02-20.md`). For `ReadMe.md`, use `intermediate-readme-{date}.md`.
+**File naming:** `intermediate-{target}-{date}.md` (e.g., `intermediate-primitive-4-skills-2026-02-20.md`). For `ReadMe.md`, use `intermediate-readme-{date}.md`.
 
 **Frontmatter:**
 ```yaml
 ---
 reviewer: 'The Intermediate'
-target: 'docs/part-2-4-skills.md'
+target: 'docs/primitive-4-skills.md'
 date: 2026-02-20
 status: pending
 ---

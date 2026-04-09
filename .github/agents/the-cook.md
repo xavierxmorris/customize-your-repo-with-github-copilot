@@ -58,13 +58,13 @@ End every review with a **Expert Verdict:** a one-sentence assessment of whether
 
 After reviewing a documentation file, write your feedback to `.github/feedback/` so the Doc Maintainer can pick it up.
 
-**File naming:** `cook-{target}-{date}.md` (e.g., `cook-part-2-6-mcp-2026-02-20.md`). For `ReadMe.md`, use `cook-readme-{date}.md`.
+**File naming:** `cook-{target}-{date}.md` (e.g., `cook-primitive-6-mcp-2026-02-20.md`). For `ReadMe.md`, use `cook-readme-{date}.md`.
 
 **Frontmatter:**
 ```yaml
 ---
 reviewer: 'The Cook'
-target: 'docs/part-2-6-mcp.md'
+target: 'docs/primitive-6-mcp.md'
 date: 2026-02-20
 status: pending
 ---

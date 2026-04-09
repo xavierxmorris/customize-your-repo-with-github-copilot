@@ -16,9 +16,16 @@ This repository contains "The Definitive Guide to Customizing Your Repo for GitH
 - All technical claims must align with official documentation:
   - https://code.visualstudio.com/docs/copilot
   - https://docs.github.com/en/copilot
+  - https://github.com/github/copilot-cli
+  - https://github.com/features/copilot/cli/
+  - https://github.blog/changelog/label/copilot/
+  - https://github.blog/ (announcements, feature deep-dives, and engineering posts)
+  - https://github.blog/ai-and-ml/automate-repository-tasks-with-github-agentic-workflows/ (GitHub Agentic Workflows — Continuous AI via coding agents in GitHub Actions)
+  - https://docs.github.com/en/copilot/concepts/agents/copilot-memory (Copilot Memory — automatic repository-level learning)
 - **Always fetch the latest documentation before answering questions about Copilot features** — your training data may be outdated
 - Use the Microsoft docs tools to search and fetch from code.visualstudio.com
-- Use the fetch_webpage tool for docs.github.com/en/copilot pages
+- Use the fetch_webpage tool for docs.github.com/en/copilot, github.com/github/copilot-cli, github.com/features/copilot/cli, and github.blog pages
+- **Fallback to web search:** If none of the trusted sources above contain information on a topic, perform a Bing search to find relevant results, then critically evaluate the accuracy of what you find before incorporating it. Flag any claims sourced this way as unverified by official docs.
 - Never invent frontmatter fields, tool names, or configuration options
 
 ### The Eight Primitives

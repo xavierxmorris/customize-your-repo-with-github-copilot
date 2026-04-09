@@ -18,13 +18,13 @@ This folder is the communication channel between the reviewer agents (The Newb, 
 | Component | Description | Example |
 |-----------|-------------|---------|
 | `agent` | Reviewer slug: `newb`, `intermediate`, `cook` | `newb` |
-| `target` | Doc file reviewed (without extension) | `part-2-3-prompts` |
+| `target` | Doc file reviewed (without extension) | `primitive-3-prompts` |
 | `date` | ISO date of review | `2026-02-20` |
 
 **Examples:**
-- `newb-part-2-1-always-on-instructions-2026-02-20.md`
+- `newb-primitive-1-always-on-instructions-2026-02-20.md`
 - `intermediate-readme-2026-02-20.md`
-- `cook-part-2-6-mcp-2026-02-20.md`
+- `cook-primitive-6-mcp-2026-02-20.md`
 
 ## Feedback File Format
 
@@ -33,7 +33,7 @@ Each feedback file must include this frontmatter:
 ```yaml
 ---
 reviewer: 'The Newb' | 'The Intermediate' | 'The Cook'
-target: 'docs/part-2-3-prompts.md'
+target: 'docs/primitive-3-prompts.md'
 date: 2026-02-20
 status: pending | in-progress | resolved
 ---

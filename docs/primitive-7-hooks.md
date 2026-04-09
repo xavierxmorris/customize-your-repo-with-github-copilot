@@ -1,6 +1,6 @@
-# Hooks (Preview)
+# Hooks
 
-[← MCP](part-2-6-mcp.md) | [Part II Overview](part-2-primitives.md)
+[← MCP](primitive-6-mcp.md) | [Part II Overview](part-2-primitives.md)
 
 *Published: February 20, 2026 · Validated against VS Code 1.109 and GitHub Copilot docs as of this date.*
 
@@ -14,7 +14,7 @@ Seven of the eight customization primitives — instructions, file-based instruc
 
 Hooks fill that gap. They execute custom shell commands at key points during Copilot coding agent sessions, operating *outside* the model entirely. The LLM never sees hook logic, can't override it, and can't reason around it. This gives teams an enforcement layer that's independent of prompt engineering.
 
-**Loading:** During coding agent sessions (GitHub and Copilot CLI), and in VS Code Chat agent sessions (1.109.3+)
+**Loading:** During coding agent sessions (GitHub and GitHub Copilot CLI)*
 **Best For:** Security enforcement, audit logging, compliance, and runtime guardrails
 
 **Location:** `.github/hooks/*.json`
@@ -1195,6 +1195,43 @@ fi
 
 Pair this with GitHub's built-in secret scanning for defense in depth — hooks catch runtime exposure, while secret scanning catches committed credentials.
 
+### Pattern: Deployment Gate Validation
+
+Enforce deployment readiness checks before the agent can execute deploy-related commands — ensuring that even autonomous agents follow release procedures:
+
+```bash
+#!/bin/bash
+# Deployment Gate — adapt the test and audit commands to your stack.
+# This example uses npm; replace with pytest, go test, cargo test, etc.
+INPUT=$(cat)
+TOOL_NAME=$(echo "$INPUT" | jq -r '.toolName')
+
+if [ "$TOOL_NAME" = "bash" ]; then
+  COMMAND=$(echo "$INPUT" | jq -r '.toolArgs' | jq -r '.command')
+
+  # Detect deployment commands
+  if echo "$COMMAND" | grep -qiE "deploy|kubectl apply|terraform apply|helm upgrade|git push.*main"; then
+
+    # Gate 1: Tests must pass (adapt to your test runner)
+    if ! npm test --silent 2>/dev/null; then
+      echo '{"permissionDecision":"deny","permissionDecisionReason":"Deployment blocked: tests must pass before deploying"}'
+      exit 0
+    fi
+
+    # Gate 2: No high-severity vulnerabilities (adapt to your audit tool)
+    if npm audit --production 2>/dev/null | grep -q "high\|critical"; then
+      echo '{"permissionDecision":"deny","permissionDecisionReason":"Deployment blocked: resolve high/critical vulnerabilities first"}'
+      exit 0
+    fi
+
+    # Gate 3: Log the deployment attempt
+    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ),deploy-attempt,$COMMAND" >> logs/deployment-audit.csv
+  fi
+fi
+```
+
+This hook pattern-matches deployment commands regardless of method (Kubernetes, Terraform, direct pushes). Replace `npm test` and `npm audit` with your project's test runner and security scanner. Pair it with an [SRE custom agent](primitive-5-custom-agents.md#additional-agent-examples) that knows your deployment procedures.
+
 ### Pattern: Keyword Alerting on Prompts
 
 Flag prompts mentioning sensitive topics:
@@ -1352,4 +1389,4 @@ VS Code hooks also support additional output fields beyond the coding agent's `p
 
 ---
 
-[← MCP](part-2-6-mcp.md) | [Next: Memory →](part-2-8-memory.md)
+[← MCP](primitive-6-mcp.md) | [Next: Copilot Memory →](primitive-8-memory.md)

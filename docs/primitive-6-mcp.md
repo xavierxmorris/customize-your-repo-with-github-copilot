@@ -1,8 +1,6 @@
 # MCP (Model Context Protocol)
 
-[← Custom Agents](part-2-5-custom-agents.md) | [Part II Overview](part-2-primitives.md)
-
-*Published: February 20, 2026 · Validated against VS Code 1.109 and GitHub Copilot docs as of this date.*
+[← Custom Agents](primitive-5-custom-agents.md) | [Part II Overview](part-2-primitives.md)
 
 ---
 
@@ -121,12 +119,12 @@ MCP servers are configured in dedicated `mcp.json` files:
 
 When the server starts, VS Code prompts for `databaseHost` and `databasePort` values. Combine with `${env:VAR}` for secrets that should come from the environment.
 
-**For HTTP/SSE servers:**
+**For HTTP servers:**
 ```json
 {
   "servers": {
     "remote-server": {
-      "type": "sse",
+      "type": "http",
       "url": "https://example.com/mcp",
       "headers": { "Authorization": "Bearer ${env:TOKEN}" }
     }
@@ -204,7 +202,34 @@ The best setups combine them: an MCP server handles "how to connect to Jira" whi
 - Need to encode team conventions or workflows? → Skill
 - Need both access AND conventions? → Use both
 
-For a detailed exploration with practical examples (Git, Jira, file operations), see [Skills vs. MCP Servers: When to Use Which](part-2-4-skills.md#skills-vs-mcp-servers-when-to-use-which).
+**Infrastructure and DevOps MCP servers** demonstrate how this pattern extends to operations workflows. If your team uses (or builds) MCP servers for infrastructure tools, the same skill-plus-MCP architecture applies:
+
+| Use Case | MCP Server Would Provide | Pair With |
+|----------|------------------------|-----------| 
+| **Kubernetes** | Cluster state, pod logs, scaling, rollouts | Deployment skill for team conventions |
+| **Terraform / IaC** | Plan, apply, state queries | Infrastructure review agent |
+| **Cloud Provider** (Azure, AWS, GCP) | Resource management, metrics, cost data | Operations agent for infrastructure tasks |
+| **Monitoring** (Datadog, Grafana, Prometheus) | Alerts, dashboards, metric queries | Triage skill for runbook-based workflows |
+
+The same principle applies: the MCP server provides *access* to infrastructure APIs, while skills and instructions encode *how your team uses them*.
+
+For a detailed exploration with practical examples (Git, Jira, file operations, incident response), see [Skills vs. MCP Servers: When to Use Which](primitive-4-skills.md#skills-vs-mcp-servers-when-to-use-which).
+
+### MCP in GitHub Copilot CLI
+
+[GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli) comes with the GitHub MCP server pre-configured, enabling interaction with GitHub.com resources — merging pull requests, creating issues, and managing repositories — directly from the terminal.
+
+**Adding MCP servers in the CLI:**
+
+1. Type `/mcp add` in an interactive session
+2. Fill in the server details using Tab to navigate between fields
+3. Press Ctrl+S to save
+
+Server configurations are stored in `~/.copilot/mcp-config.json` (or the location specified by `XDG_CONFIG_HOME`). The CLI uses the same JSON structure as VS Code's `mcp.json` for server definitions.
+
+**Checking available MCP tools:** Type `/mcp` in interactive mode to see configured servers and their available tools.
+
+This means MCP configurations benefit developers across both VS Code and the CLI. While the configuration files are stored in different locations (`.vscode/mcp.json` for VS Code, `~/.copilot/mcp-config.json` for CLI), teams can standardize on the same MCP servers across both surfaces.
 
 ### Beyond Tools: Resources, Prompts, and Apps
 
@@ -313,8 +338,8 @@ Copilot discovers the GitHub MCP tools, calls the appropriate one, and returns l
 
 ### Step 5: Combine with a Skill
 
-For team-consistent workflows, pair the MCP server with a skill that encodes your conventions. See [Skills vs. MCP Servers](part-2-4-skills.md#skills-vs-mcp-servers-when-to-use-which) for the hybrid pattern.
+For team-consistent workflows, pair the MCP server with a skill that encodes your conventions. See [Skills vs. MCP Servers](primitive-4-skills.md#skills-vs-mcp-servers-when-to-use-which) for the hybrid pattern.
 
 ---
 
-[← Custom Agents](part-2-5-custom-agents.md) | [Next: Hooks →](part-2-7-hooks.md)
+[← Custom Agents](primitive-5-custom-agents.md) | [Next: Hooks →](primitive-7-hooks.md)

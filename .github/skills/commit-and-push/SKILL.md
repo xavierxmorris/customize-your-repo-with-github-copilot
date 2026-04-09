@@ -55,7 +55,7 @@ Update the `Published:` date line in every file that contains one. The date form
 
 Files known to contain published dates:
 - `ReadMe.md` (line 5)
-- `docs/part-2-1-always-on-instructions.md` (line 5)
+- `docs/primitive-1-always-on-instructions.md` (line 5)
 
 Search for additional `Published:` lines in case new files have adopted the pattern. The published date line follows this format:
 
@@ -90,14 +90,14 @@ Report the commit hash and confirm the push succeeded.
 
 **Agent response:**
 
-> Found 3 changed files: `ReadMe.md`, `docs/part-2-4-skills.md`, `docs/part-2-6-mcp.md`
+> Found 3 changed files: `ReadMe.md`, `docs/primitive-4-skills.md`, `docs/primitive-6-mcp.md`
 >
 > **ReadMe.md** — 1 warning
 > - Line 42: "global instructions" should be "Always-on Instructions" (terminology consistency)
 >
-> **docs/part-2-4-skills.md** — No issues found ✓
+> **docs/primitive-4-skills.md** — No issues found ✓
 >
-> **docs/part-2-6-mcp.md** — 2 suggestions
+> **docs/primitive-6-mcp.md** — 2 suggestions
 > - Line 18: Code block missing language identifier
 > - Line 35: Sentence uses passive voice unnecessarily
 >

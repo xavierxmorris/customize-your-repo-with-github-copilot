@@ -2,7 +2,7 @@
 
 [← Part I: Foundations](part-1-foundations.md) | [Part II Overview](part-2-primitives.md)
 
-*Published: February 20, 2026. This guide serves as a primer for GitHub Copilot customization. File paths, configuration options, and feature availability may change as Copilot evolves—always verify against the [official documentation](https://code.visualstudio.com/docs/copilot/overview).*
+*Published: February 10, 2026. Updated: April 2, 2026. This guide serves as a primer for GitHub Copilot customization. File paths, configuration options, and feature availability may change as Copilot evolves—always verify against the [official documentation](https://code.visualstudio.com/docs/copilot).*
 
 ---
 
@@ -12,11 +12,9 @@ Always-on instructions (also known as the **Copilot Instructions File**) represe
 
 **Location:** `.github/copilot-instructions.md`, `AGENTS.md`, or `CLAUDE.md` [*](https://code.visualstudio.com/docs/copilot)
 
-**Official docs:** [Custom instructions](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
+Both `copilot-instructions.md` and `AGENTS.md` are recognized as workspace instruction files. The `/init` command can discover and update either format.
 
-**New in VS Code 1.109:** `copilot-instructions.md`, `AGENTS.md`, and `CLAUDE.md` are all recognized as workspace instruction files. The `/init` command can discover and update any of these formats.
-
-**Required Setting:** `github.copilot.chat.codeGeneration.useInstructionFiles` must be enabled in VS Code settings for the instructions file to be applied. [*](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
+**Relevant Settings:** Instruction file detection is controlled by `chat.includeApplyingInstructions` (pattern-matched instructions), `chat.includeReferencedInstructions` (Markdown-linked instructions), and `chat.useAgentsMdFile` (`AGENTS.md` support). All are enabled by default. [*](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
 
 When this file exists in a repository and the setting is enabled, Copilot reads and applies its contents as persistent context. Chat responses and code generation will respect these guidelines without requiring explicit invocation.
 
@@ -477,11 +475,9 @@ To verify the instructions file is working correctly:
 4. Generate sample code and verify it follows the defined rules
 
 If instructions are not being applied, verify:
-- The `github.copilot.chat.codeGeneration.useInstructionFiles` setting is enabled
-- File is named exactly `copilot-instructions.md`, `AGENTS.md`, or `CLAUDE.md`
-- File is in the correct location: `copilot-instructions.md` in `.github/`, `AGENTS.md` at workspace root, or `CLAUDE.md` at workspace root or `.claude/` folder
-- For local-only overrides, check `CLAUDE.local.md` at workspace root (not committed to version control)
-- For monorepos with nested `AGENTS.md` files, verify `chat.useNestedAgentsMdFiles` is enabled
+- The `chat.includeApplyingInstructions` setting is enabled (default: `true`)
+- File is named exactly `copilot-instructions.md` or `AGENTS.md`
+- File is located in the `.github/` folder [*](https://code.visualstudio.com/docs/copilot)
 - VS Code window has been reloaded after creating the file
 
 **Using Diagnostics:** Right-click in the Chat view and select **Diagnostics** to see all loaded instruction files, custom agents, prompt files, and skills—along with any errors.
@@ -492,8 +488,9 @@ The `.github/copilot-instructions.md` file is recognized by GitHub Copilot acros
 - VS Code
 - Visual Studio
 - GitHub.com (Copilot Chat, coding agent, code review)
+- [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli) (terminal-based AI agent)
 
-This means the same instructions file works whether your team uses different editors or interacts with Copilot on the web.
+This means the same instructions file works whether your team uses different editors, interacts with Copilot on the web, or works from the command line. Copilot CLI also recognizes `AGENTS.md` as a workspace instruction file.
 
 ## Instruction Priority
 
@@ -572,4 +569,4 @@ For folder-specific instructions without the experimental setting, file-based in
 
 ---
 
-[← Part I: Foundations](part-1-foundations.md) | [Next: File-Based Instructions →](part-2-2-file-based-instructions.md)
+[← Part I: Foundations](part-1-foundations.md) | [Next: File-Based Instructions →](primitive-2-file-based-instructions.md)

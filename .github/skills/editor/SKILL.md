@@ -117,12 +117,12 @@ When reviewing a file:
 ## Example Review
 
 ### Input
-User modifies `docs/part-2-1-always-on-instructions.md`
+User modifies `docs/primitive-1-always-on-instructions.md`
 
 ### Output
 
 ```markdown
-## Editorial Review: part-2-1-always-on-instructions.md
+## Editorial Review: primitive-1-always-on-instructions.md
 
 ### Summary
 Generally well-structured document covering always-on instructions. Found 1 critical issue (outdated setting name), 2 major issues (broken link, missing section), and 3 minor formatting inconsistencies.

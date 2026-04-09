@@ -139,14 +139,14 @@ Map transcript content to guide sections:
 
 | Guide File | Potential Demo Links |
 |------------|---------------------|
-| docs/part-2-5-custom-agents.md | Videos about custom agents, agent skills, handoffs, sub-agents |
-| docs/part-2-6-mcp.md | Videos about MCP servers, MCP apps, external integrations |
-| docs/part-2-4-skills.md | Videos about agent skills, skill creation |
-| docs/part-2-7-hooks.md | Videos about hooks, security enforcement |
+| docs/primitive-5-custom-agents.md | Videos about custom agents, agent skills, handoffs, sub-agents |
+| docs/primitive-6-mcp.md | Videos about MCP servers, MCP apps, external integrations |
+| docs/primitive-4-skills.md | Videos about agent skills, skill creation |
+| docs/primitive-7-hooks.md | Videos about hooks, security enforcement |
 | docs/part-1-foundations.md | Keynotes, overview talks, AI SDLC discussions |
-| docs/part-2-1-always-on-instructions.md | Videos about copilot-instructions.md |
-| docs/part-2-2-file-based-instructions.md | Videos about .instructions.md files |
-| docs/part-2-3-prompts.md | Videos about prompt files |
+| docs/primitive-1-always-on-instructions.md | Videos about copilot-instructions.md |
+| docs/primitive-2-file-based-instructions.md | Videos about .instructions.md files |
+| docs/primitive-3-prompts.md | Videos about prompt files |
 
 Demo links in the guide use this format:
 

@@ -1,8 +1,6 @@
 # Skills
 
-[← Prompt Files](part-2-3-prompts.md) | [Part II Overview](part-2-primitives.md)
-
-*Published: February 20, 2026 · Validated against VS Code 1.109 and GitHub Copilot docs as of this date.*
+[← Prompt Files](primitive-3-prompts.md) | [Part II Overview](part-2-primitives.md)
 
 ---
 
@@ -155,6 +153,9 @@ magick input.jpg -quality 85 output.webp
 |-------|----------|-------------|
 | `name` | Yes | 1-64 chars, lowercase, hyphens only, must match directory name |
 | `description` | Yes | 1-1024 chars, describe WHAT it does AND WHEN to use it |
+| `argument-hint` | No | Hint text shown in the chat input field when invoked as a slash command |
+| `user-invocable` | No | Controls whether the skill appears as a `/` slash command in chat (default: `true`). Set to `false` to hide from the menu while still allowing automatic loading |
+| `disable-model-invocation` | No | Controls whether the agent can automatically load the skill based on relevance (default: `false`). Set to `true` to require manual `/` invocation only |
 | `metadata` | No | Key-value pairs (author, version, etc.) |
 | `license` | No | License name or reference |
 | `compatibility` | No | Environment requirements |
@@ -335,7 +336,7 @@ A [reference implementation](https://github.com/anthropics/skills) is available 
 
 With the skill-creator in your repo, bootstrapping new skills becomes conversational:
 
-> 💬 **Try this prompt:**
+> 💬 Try this prompt:
 >
 > `Create a skill for linting SQL queries`
 
@@ -381,7 +382,7 @@ Check for common issues:
 
 For more control, provide context in your prompt:
 
-> 💬 **Try this prompt:**
+> 💬 Try this prompt:
 >
 > `Create a skill for Kubernetes deployments. It should cover kubectl commands, common YAML patterns, and debugging pods. Include a scripts/ directory for helper scripts.`
 
@@ -418,7 +419,7 @@ Teams using the skill-creator pattern report rapid capability growth:
 
 Each skill is:
 - Version-controlled alongside code
-- Portable across AI agents (VS Code, GitHub CLI, Copilot coding agent)
+- Portable across AI agents (VS Code, GitHub Copilot CLI, Copilot coding agent)
 - Discoverable via description matching
 - Maintainable by the whole team
 
@@ -478,7 +479,7 @@ Both approaches work. Neither is wrong.
 |----------|----------|-----------|
 | Knowledge tied to specific files/folders | File-based instruction | Glob patterns match the context naturally |
 | Knowledge tied to user intent/task | Skill | Description matching aligns with what the user is trying to do |
-| Need portability across AI agents | Skill | agentskills.io spec works in VS Code, GitHub CLI, coding agent |
+| Need portability across AI agents | Skill | agentskills.io spec works in VS Code, GitHub Copilot CLI, coding agent |
 | Need supporting files (templates, scripts) | Skill | Skills are directories; instructions are single files |
 | Want automatic activation by file location | File-based instruction | `applyTo` is deterministic |
 | Want automatic activation by conversation | Skill | Description matching is semantic |
@@ -516,8 +517,8 @@ Is this needed on EVERY request?
                   file patterns that won't be needed elsewhere.
 ```
 
-**Current recommendation (February 2026):** Start with skills as your default. Agent Skills are now generally available and enabled by default in VS Code 1.109. They're:
-- Portable across AI agents (VS Code, GitHub CLI, coding agent)
+**Our current recommendation (April 2026):** Start with skills as your default. Skills are:
+- Portable across AI agents (VS Code, GitHub Copilot CLI, coding agent)
 - Only loaded when relevant (keeps context lean)
 - Self-contained directories (can include templates, scripts, examples)
 - Also available as `/` slash commands alongside prompt files
@@ -525,7 +526,7 @@ Is this needed on EVERY request?
 
 Use always-on instructions for the core stuff that truly applies everywhere — your tech stack, universal coding conventions, security requirements. Use file-based instructions when you have rules that are genuinely file-pattern-specific and won't be reused.
 
-**Editor's Note:** The primitives overlap because this space is evolving rapidly. GitHub and the community are actively experimenting with these patterns. What we recommend today may shift as we learn more. The best approach is to try things, see what helps your team, and share what you learn.
+> **📝 Editor's Note:** We're still learning what works best. The primitives overlap because this space is evolving rapidly. GitHub and the community are actively experimenting with these patterns. What we recommend today may shift as we learn more. The best approach is to try things, see what helps your team, and share what you learn.
 
 ### How Skills Load: Description Matching
 
@@ -561,7 +562,7 @@ description: 'Resize, convert, compress, and batch-process images using ImageMag
 
 ### What the Spec Does (and Doesn't) Control
 
-The [agentskills.io](https://agentskills.io) specification intentionally leaves certain decisions to the **host** (VS Code, GitHub CLI, coding agent):
+The [agentskills.io](https://agentskills.io) specification intentionally leaves certain decisions to the **host** (VS Code, GitHub Copilot CLI, coding agent):
 
 | Controlled by Spec | Left to Host |
 |-------------------|--------------|
@@ -571,14 +572,14 @@ The [agentskills.io](https://agentskills.io) specification intentionally leaves 
 | Resource references | Package management |
 | Compatibility declarations | Discovery mechanism |
 
-This design allows the same skill to work across different agents while each host optimizes for its environment. A skill written for VS Code will also work with the GitHub CLI and coding agent without modification.
+This design allows the same skill to work across different agents while each host optimizes for its environment. A skill written for VS Code will also work with GitHub Copilot CLI and the coding agent without modification.
 
 **Compatibility Field:**
 Skills can declare which environments they support using a string value (max 500 characters):
 
 ```markdown
 ---
-compatibility: Works with VS Code, GitHub CLI, and coding agent
+compatibility: Designed for VS Code, GitHub Copilot CLI, and the coding agent
 ---
 ```
 
@@ -895,6 +896,56 @@ Disk usage: `du -sh directory`
 
 #### The Hybrid Pattern
 
+---
+
+**Incident Response → Skill + MCP Server**
+
+Incident response combines local diagnostic procedures (encoded as a skill) with external access to monitoring and ticketing systems (via MCP servers). The skill encodes triage runbooks and remediation patterns; the MCP server provides access to monitoring dashboards and ticketing APIs.
+
+**Directory:** `.github/skills/incident-response/SKILL.md`
+
+```
+---
+name: incident-response
+description: Guide incident response workflows including triage, diagnosis, remediation, and postmortem documentation. Use when production incidents occur, alerts fire, or the user needs help investigating service degradation.
+---
+
+# Incident Response
+
+## When to use this skill
+
+Use this skill when:
+- A production alert fires or service degradation is reported
+- User needs to triage an incident (severity, impact, affected services)
+- User needs to investigate root cause from logs or metrics
+- User wants to document a postmortem
+
+## Triage checklist
+
+1. Identify severity: P1 (full outage), P2 (degraded), P3 (minor)
+2. Identify affected services and blast radius
+3. Check recent deployments: `git log --oneline --since='6 hours ago'`
+4. Check monitoring dashboards (use monitoring MCP server if available)
+5. Assign incident commander and communicate status
+
+## Remediation patterns
+
+- **Bad deployment:** Roll back with `git revert` + redeploy
+- **Resource exhaustion:** Scale horizontally, then investigate root cause
+- **Configuration error:** Identify changed config, revert, redeploy
+- **Dependency failure:** Check status pages, enable circuit breakers
+
+## Postmortem template
+
+After resolution, create a postmortem issue with:
+- Timeline of events
+- Root cause analysis
+- What went well / what didn't
+- Action items with owners and deadlines
+```
+
+---
+
 In practice, many workflows combine both:
 
 1. **Skill** handles local operations (git commit, file changes, running tests)
@@ -914,4 +965,4 @@ For more on building skills, visit [agentskills.io/home](https://agentskills.io/
 
 ---
 
-[← Prompt Files](part-2-3-prompts.md) | [Next: Custom Agents →](part-2-5-custom-agents.md)
+[← Prompt Files](primitive-3-prompts.md) | [Next: Custom Agents →](primitive-5-custom-agents.md)
